@@ -1,0 +1,1 @@
+extend-diff-ignore = "^(\.flux|build|clone\.log|.*_repo|test-repo|merge_test|local_.*|DevWire.*|hello)(/.*)?$"

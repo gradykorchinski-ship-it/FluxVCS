@@ -1,0 +1,14 @@
+Source: flux-vcs
+Section: devel
+Priority: optional
+Maintainer: Grady Korchinski <grady.korchinski@gmail.com>
+Build-Depends: debhelper-compat (= 13), cmake, libsqlite3-dev, libssl-dev, libcurl4-openssl-dev, zlib1g-dev, libzstd-dev, pkg-config
+Standards-Version: 4.6.2
+Homepage: https://github.com/gradykorchinski-ship-it/FluxVCS
+
+Package: flux-vcs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Next-generation version control system
+ FluxVCS is a distributed version control system designed for speed and
+ efficiency. It supports standard Git protocols and offers a modern CLI.
