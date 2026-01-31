@@ -12,6 +12,7 @@ enable_testing()
 add_executable(core_tests
     core/test_object_id.cpp
     core/test_chunker.cpp
+    core/test_hash.cpp
 )
 
 target_link_libraries(core_tests PRIVATE

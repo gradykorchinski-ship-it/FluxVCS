@@ -2,7 +2,7 @@ Source: flux-vcs
 Section: devel
 Priority: optional
 Maintainer: Grady Korchinski <grady.korchinski@gmail.com>
-Build-Depends: debhelper-compat (= 13), cmake, libsqlite3-dev, libssl-dev, libcurl4-openssl-dev, zlib1g-dev, libzstd-dev, pkg-config
+Build-Depends: debhelper-compat (= 13), cmake, libsqlite3-dev, libssl-dev, libcurl4-openssl-dev, zlib1g-dev, libzstd-dev, pkg-config, libcli11-dev, libfmt-dev
 Standards-Version: 4.6.2
 Homepage: https://github.com/gradykorchinski-ship-it/FluxVCS
 

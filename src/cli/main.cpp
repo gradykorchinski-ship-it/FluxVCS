@@ -239,8 +239,50 @@ int main(int argc, char** argv) {
     
     // Remote command  
     auto remote_cmd = app.add_subcommand("remote", "Manage remotes");
-    remote_cmd->allow_extras();
-    remote_cmd->callback([argc, argv]() { std::exit(cmd_remote(argc, argv)); });
+    static std::string remote_op;
+    static std::string remote_name_arg;
+    static std::string remote_url_arg;
+    remote_cmd->add_option("operation", remote_op, "Operation (add, remove, list/v)");
+    remote_cmd->add_option("name", remote_name_arg, "Remote name");
+    remote_cmd->add_option("url", remote_url_arg, "Remote URL");
+    remote_cmd->callback([&]() {
+        auto repo_res = flux::Repository::open(".");
+        if (!repo_res) {
+            fmt::print(stderr, "Error: {}\n", repo_res.error());
+            std::exit(1);
+        }
+        auto& repo = **repo_res;
+
+        if (remote_op == "add") {
+            if (remote_name_arg.empty() || remote_url_arg.empty()) {
+                fmt::print(stderr, "Usage: flux remote add <name> <url>\n");
+                std::exit(1);
+            }
+            repo.add_remote(remote_name_arg, remote_url_arg);
+            fmt::print("Remote '{}' added with URL '{}'\n", remote_name_arg, remote_url_arg);
+        } else if (remote_op == "remove" || remote_op == "rm") {
+            if (remote_name_arg.empty()) {
+                fmt::print(stderr, "Usage: flux remote remove <name>\n");
+                std::exit(1);
+            }
+            repo.remove_remote(remote_name_arg);
+            fmt::print("Remote '{}' removed\n", remote_name_arg);
+        } else if (remote_op == "list" || remote_op.empty() || remote_op == "-v" || remote_op == "v") {
+            if (repo.remotes().empty()) {
+                // No remotes configured
+            } else {
+                for (const auto& [name, url] : repo.remotes()) {
+                    fmt::print("{}\t{} (fetch)\n", name, url);
+                    fmt::print("{}\t{} (push)\n", name, url);
+                }
+            }
+        } else {
+            // Check if it's just 'flux remote -v' 
+            // In CLI11 'remote -v' might set remote_op to '-v'
+            fmt::print(stderr, "Unknown remote operation: {}\n", remote_op);
+            std::exit(1);
+        }
+    });
 
     // Auth command
     auto auth_cmd = app.add_subcommand("auth", "Manage authentication");
@@ -368,9 +410,18 @@ int main(int argc, char** argv) {
         // Find remote URL if not provided
         std::string url = push_url;
         if (url.empty()) {
-            // Default to 'origin' if it exists. 
-            // For now, let's just make it required if no origin is configured.
-            fmt::print(stderr, "Error: Remote URL is required.\n");
+            url = "origin";
+        }
+
+        // Try to resolve remote name
+        std::string resolved_url = repo.get_remote_url(url);
+        if (!resolved_url.empty()) {
+            url = resolved_url;
+        }
+
+        if (url.empty() || (!url.starts_with("http") && !url.starts_with("git") && !url.starts_with("ssh") && url.find('/') == std::string::npos)) {
+            // If it's still just a name and not a URL, we can't push
+            fmt::print(stderr, "Error: Could not resolve remote '{}' to a URL.\n", url);
             std::exit(1);
         }
 

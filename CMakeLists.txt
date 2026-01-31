@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(FluxVCS VERSION 0.1.0 LANGUAGES CXX)
+project(FluxVCS VERSION 0.1.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,24 +23,36 @@ find_package(ZLIB REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ZSTD REQUIRED IMPORTED_TARGET libzstd)
 
-# Third-party libraries (header-only)
-include(FetchContent)
+# Third-party libraries
+# Try to find system packages first (required for Debian/Ubuntu packaging)
+# Fall back to FetchContent if not available
 
-# CLI11 for argument parsing
-FetchContent_Declare(
-    cli11
-    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
-    GIT_TAG v2.3.2
-)
+find_package(CLI11 QUIET)
+find_package(fmt QUIET)
 
-# {fmt} for formatting
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 10.1.1
-)
-
-FetchContent_MakeAvailable(cli11 fmt)
+if(NOT CLI11_FOUND OR NOT fmt_FOUND)
+    include(FetchContent)
+    
+    if(NOT CLI11_FOUND)
+        # CLI11 for argument parsing
+        FetchContent_Declare(
+            cli11
+            GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+            GIT_TAG v2.3.2
+        )
+        FetchContent_MakeAvailable(cli11)
+    endif()
+    
+    if(NOT fmt_FOUND)
+        # {fmt} for formatting
+        FetchContent_Declare(
+            fmt
+            GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+            GIT_TAG 10.1.1
+        )
+        FetchContent_MakeAvailable(fmt)
+    endif()
+endif()
 
 # Core library
 add_library(flux_core STATIC
@@ -115,6 +127,11 @@ target_link_libraries(flux PRIVATE
 # Benchmarks
 if(FLUX_BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
+endif()
+
+# Tests
+if(FLUX_BUILD_TESTS)
+    add_subdirectory(tests)
 endif()
 
 # Installation rules

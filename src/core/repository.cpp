@@ -176,6 +176,13 @@ Result<void> Repository::load_config() {
                 user_name_ = std::string(value);
             } else if (key == "user.email") {
                 user_email_ = std::string(value);
+            } else if (key.starts_with("remote.")) {
+                auto rest = key.substr(7);
+                auto dot_pos = rest.find(".url");
+                if (dot_pos != std::string_view::npos) {
+                    auto name = rest.substr(0, dot_pos);
+                    remotes_[std::string(name)] = std::string(value);
+                }
             }
         }
     }
@@ -196,6 +203,10 @@ Result<void> Repository::save_config() {
         user_name_,
         user_email_
     );
+    
+    for (const auto& [name, url] : remotes_) {
+        config += fmt::format("remote.{}.url={}\n", name, url);
+    }
     
     Bytes data(config.begin(), config.end());
     return Filesystem::write_file(config_path, data);
@@ -345,4 +356,22 @@ void flux::Repository::set_user_info(std::string name, std::string email) {
     user_name_ = std::move(name);
     user_email_ = std::move(email);
     save_config();
+}
+
+void flux::Repository::add_remote(const std::string& name, const std::string& url) {
+    remotes_[name] = url;
+    save_config();
+}
+
+void flux::Repository::remove_remote(const std::string& name) {
+    remotes_.erase(name);
+    save_config();
+}
+
+std::string flux::Repository::get_remote_url(const std::string& name) const {
+    auto it = remotes_.find(name);
+    if (it != remotes_.end()) {
+        return it->second;
+    }
+    return "";
 }

@@ -1,5 +1,8 @@
-flux-vcs (0.1.0-1) noble; urgency=medium
+flux-vcs (0.1.1-1) noble; urgency=medium
 
-  * Initial release.
+  * Fix build dependencies for Launchpad PPA
+  * Add libcli11-dev and libfmt-dev to Build-Depends
+  * Update CMakeLists.txt to prefer system packages
+  * Fix Git protocol newline compliance
 
- -- Grady Korchinski <grady.korchinski@gmail.com>  Thu, 29 Jan 2026 12:00:00 -0600
+ -- Grady Korchinski <grady.korchinski@gmail.com>  Thu, 30 Jan 2026 01:25:00 -0600

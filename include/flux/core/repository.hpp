@@ -8,6 +8,8 @@
 #include "flux/index/index.hpp"
 #include <memory>
 #include <vector>
+#include <map>
+#include <string>
 
 namespace flux {
 
@@ -63,6 +65,12 @@ public:
     const std::string& user_email() const { return user_email_; }
     void set_user_info(std::string name, std::string email);
     
+    // Remote management
+    void add_remote(const std::string& name, const std::string& url);
+    void remove_remote(const std::string& name);
+    std::string get_remote_url(const std::string& name) const;
+    const std::map<std::string, std::string>& remotes() const { return remotes_; }
+    
 private:
     Repository(Path repo_path, HashAlgorithm algo);
     
@@ -79,6 +87,7 @@ private:
     
     std::string user_name_ = "FluxVCS User";
     std::string user_email_ = "user@example.com";
+    std::map<std::string, std::string> remotes_;
 };
 
 } // namespace flux
