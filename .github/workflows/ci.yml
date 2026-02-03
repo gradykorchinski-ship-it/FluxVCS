@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libsqlite3-dev libssl-dev libzstd-dev pkg-config libcurl4-openssl-dev zlib1g-dev
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DFLUX_BUILD_TESTS=ON -DFLUX_BUILD_BENCHMARKS=ON
+
+    - name: Build
+      run: cmake --build build --config Release -j$(nproc)
+
+    - name: Test
+      working-directory: build
+      run: ctest --output-on-failure

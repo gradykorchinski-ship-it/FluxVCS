@@ -6,7 +6,11 @@
 
 namespace flux {
 
-ObjectStore::ObjectStore(Path objects_dir) : objects_dir_(std::move(objects_dir)) {
+ObjectStore::ObjectStore(Path objects_dir) 
+    : objects_dir_(std::move(objects_dir))
+    , pack_manager_(objects_dir_ / "pack") {
+    // Attempt to load existing packs, ignore errors in constructor
+    (void)pack_manager_.load_packs();
 }
 
 Result<ObjectId> ObjectStore::write(ObjectType type, std::span<const uint8_t> data, HashAlgorithm algo) {
@@ -34,7 +38,10 @@ Result<Bytes> ObjectStore::read(const ObjectId& id) {
         return loose_result;
     }
     
-    // TODO: Try pack files
+    // Try pack files
+    if (pack_manager_.contains(id)) {
+        return pack_manager_.read_object(id);
+    }
     
     return flux::unexpected(fmt::format("Object not found: {}", id.to_hex()));
 }

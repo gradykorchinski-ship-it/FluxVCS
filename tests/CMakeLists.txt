@@ -13,6 +13,7 @@ add_executable(core_tests
     core/test_object_id.cpp
     core/test_chunker.cpp
     core/test_hash.cpp
+    core/test_pack_integration.cpp
 )
 
 target_link_libraries(core_tests PRIVATE

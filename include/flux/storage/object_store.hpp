@@ -2,6 +2,7 @@
 
 #include "flux/core/types.hpp"
 #include "flux/core/object_id.hpp"
+#include "flux/storage/packfile.hpp"
 
 namespace flux {
 
@@ -38,6 +39,7 @@ private:
     Result<Bytes> read_loose(const ObjectId& id);
     
     Path objects_dir_;
+    PackManager pack_manager_;
 };
 
 } // namespace flux
