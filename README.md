@@ -1,93 +1,106 @@
 # FluxVCS
 
-A modern distributed version control system built in C++ that addresses the architectural, usability, performance, and safety limitations of Git.
+A modern distributed version control system built in **Zig** that addresses the architectural, usability, performance, and safety limitations of Git.
 
 ## Key Features
 
+- **Built with Zig 0.15.2**: High-performance, memory-safe, and robust codebase
 - **Safe by Default**: Transactional operations with write-ahead logging prevent data loss
 - **Chunk-Based Storage**: Efficient handling of large files and binaries with content-defined chunking
-- **Algorithm-Agile**: Pluggable hash algorithms for future-proof cryptographic agility
+- **Algorithm-Agile**: Pluggable hash algorithms (SHA-1, SHA-256, SHA3, BLAKE3)
 - **Fast Operations**: SQLite-based indexing for O(1) status checks
-- **Semantic Awareness**: Foundation for AST-based diffs and merges (future phases)
+- **Semantic Awareness**: Foundation for AST-based diffs and merges
 
 ## Current Status
 
-**Phase 1: Core Engine & Foundation** (In Development)
+**Phase 1: Core Engine & Foundation** (Migrated from C++ to Zig)
 
 - ✅ Repository initialization
-- ✅ Chunk-based object storage
-- ✅ Transactional operations
-- ✅ Basic CLI commands (init, add, commit, branch, log, status)
+- ✅ Chunk-based object storage (CDC)
+- ✅ Transactional operations (WAL)
+- ✅ Algorithm-agile hashing
+- ✅ Core CLI commands (init, add, commit, branch, log, status, diff, show, tag, reset)
 
 ## Building
 
 ### Requirements
 
-- C++20 compatible compiler (GCC 10+, Clang 12+)
-- CMake 3.20+
-- SQLite3
-- OpenSSL
-- zstd
+- **Zig 0.15.2**
+- **SQLite3** development headers
+- **OpenSSL** development headers
+- **zstd** development headers
+- **CURL** development headers
+- **zlib** development headers
 
 ### Ubuntu/Debian
 
 ```bash
-sudo apt-get install build-essential cmake libsqlite3-dev libssl-dev libzstd-dev pkg-config
+sudo apt install zig sqlite3 libsqlite3-dev libssl-dev libzstd-dev libcurl4-openssl-dev zlib1g-dev
 ```
+
+*Note: If Zig 0.15.2 is not in your package manager, download it from [ziglang.org](https://ziglang.org/download/).*
 
 ### Build Instructions
 
 ```bash
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
+# Clone the repository
+git clone https://github.com/gradykorchinski-ship-it/FluxVCS.git
+cd FluxVCS
+
+# Build the project
+zig build
+
+# The binary will be available at:
+./zig-out/bin/flux
 ```
 
 ### Running Tests
 
 ```bash
-cd build
-ctest --output-on-failure
+zig build test
 ```
 
 ## Quick Start
 
 ```bash
 # Initialize a new repository
-./flux init my-project
+./zig-out/bin/flux init my-project
 cd my-project
 
 # Add files
 echo "Hello FluxVCS" > README.md
-./flux add README.md
+../zig-out/bin/flux add README.md
 
 # Commit changes
-./flux commit -m "Initial commit"
+../zig-out/bin/flux commit -m "Initial commit"
 
 # View history
-./flux log
+../zig-out/bin/flux log
 
 # Check status
-./flux status
+../zig-out/bin/flux status
+
+# Show changes
+../zig-out/bin/flux diff
 ```
 
 ## Architecture
 
 FluxVCS uses a layered architecture:
 
-- **CLI Layer**: User-facing commands
+- **CLI Layer**: User-facing commands in Zig
 - **Core Engine**: Repository logic and object model
 - **Storage Backend**: Object store, references, and WAL
 - **Index Manager**: SQLite-based metadata indexing
+- **Util**: CDC chunking, compression, and hashing
 
 ## Roadmap
 
-- **Phase 1**: Core Engine & Foundation (Current)
-- **Phase 2**: Safety & Transactional Operations
-- **Phase 3**: Semantic Diff & Merge
-- **Phase 4**: Performance & Scalability
-- **Phase 5**: Network Protocol & Collaboration
-- **Phase 6**: Security & Trust
+- **Phase 1**: Core Engine & Foundation (Complete)
+- **Phase 2**: Remote Operations (clone, push, pull, fetch) - In Progress
+- **Phase 3**: Advanced Features (stash, revert, rebase)
+- **Phase 4**: Semantic Diff & Merge
+- **Phase 5**: Performance & Scalability
 
 ## License
 
@@ -95,4 +108,4 @@ MIT License - See LICENSE file for details
 
 ## Contributing
 
-This is currently in early development. Contributions welcome once Phase 1 is complete.
+FluxVCS is in active development. Contributions are welcome!
