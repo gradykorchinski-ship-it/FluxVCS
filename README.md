@@ -64,24 +64,24 @@ zig build test
 
 ```bash
 # Initialize a new repository
-./zig-out/bin/flux init my-project
+flux init my-project
 cd my-project
 
 # Add files
 echo "Hello FluxVCS" > README.md
-../zig-out/bin/flux add README.md
+flux add README.md
 
 # Commit changes
-../zig-out/bin/flux commit -m "Initial commit"
+flux commit -m "Initial commit"
 
 # View history
-../zig-out/bin/flux log
+flux log
 
 # Check status
-../zig-out/bin/flux status
+flux status
 
 # Show changes
-../zig-out/bin/flux diff
+flux diff
 ```
 
 ## Architecture
